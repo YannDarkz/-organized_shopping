@@ -10,7 +10,7 @@
     </svg>
   </button>
 
-  <p><strong>Preço:</strong> {{ price | currency: 'BRL' }}</p>
+  <p><strong>Preço:</strong> {{ price  }}</p>
   <p><strong>qtd:</strong> {{ quantity }}</p>
   <!-- <p><strong>T:</strong> {{ price * quantity | currency: 'BRL' }}</p> -->
   <button (click)="onEdit()" class="edit">Editar ✂️</button>

@@ -11,16 +11,16 @@ import { CommonModule } from '@angular/common';
 export class CardListComponent {
 
   @Input() name!: string;
-  @Input() price!: string;
+  @Input() price!: string | null;
   @Input() quantity!: number;
 
   @Output() edit = new EventEmitter<void>();
   @Output() delete = new EventEmitter<void>();
   @Output() buy = new EventEmitter<void>()
 
-  numberPrice(): void {
-    this.price = this.price.replace(/\D/g, "");
-  }
+  // numberPrice(): void {
+  //   this.price = this.price.replace(/\D/g, "");
+  // }
 
 onEdit() {
   this.edit.emit();
