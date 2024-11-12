@@ -1,45 +1,26 @@
 {
   "cold": [
     {
-      "id": "e3a8",
-      "name": "sa",
-      "price": "50,00",
-      "quantity": 1,
-      "category": "cold",
-      "userId": "107959240786162842006"
-    }
-  ],
-  "perishables": [
-    {
-      "id": "abf2",
+      "id": "a84e",
       "name": "café",
-      "price": 1,
+      "price": "10.98",
       "quantity": 1,
-      "category": "perishables",
-      "userId": "106106214451161773898"
-    }
-  ],
-  "cleaning": [
-    {
-      "id": "e67a",
-      "name": "bolo de Pote",
-      "price": 1,
-      "quantity": 1,
-      "category": "cleaning",
+      "category": "cold",
       "userId": "107959240786162842006"
-    }
-  ],
-  "others": [],
-  "cold-Buy": [
+    },
     {
-      "id": "2b3b",
-      "name": "tang",
-      "price": 5,
+      "id": "d8f8",
+      "name": "bolo de Pote",
+      "price": "50.42",
       "quantity": 1,
       "category": "cold",
       "userId": "107959240786162842006"
     }
   ],
+  "perishables": [],
+  "cleaning": [],
+  "others": [],
+  "cold-Buy": [],
   "perishables-Buy": [],
   "cleaning-Buy": [],
   "others-Buy": [],
