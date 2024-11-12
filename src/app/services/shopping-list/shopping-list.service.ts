@@ -42,6 +42,7 @@ export class ShoppingListService {
   }
 
   addItem(category: string, item: Iproduct): Observable<Iproduct> {
+    
     return this.http.post<Iproduct>(`${this.apiUrl}/${category}`, item)
     .pipe(
       catchError(this.handleError)
