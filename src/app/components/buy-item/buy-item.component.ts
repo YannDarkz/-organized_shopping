@@ -31,9 +31,6 @@ export class BuyItemComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPurchasedItems();
-      // this.loadPurchasedItems('cold');
-      // this.loadPurchasedItems('perishables');
-      // this.loadPurchasedItems('cleaning');
   }
 
   loadPurchasedItems(): void {
@@ -48,12 +45,44 @@ export class BuyItemComponent implements OnInit {
    })
   }
 
-  calculateTotalPrice(): void {
+  calculateTotalPric(): void {
     this.buyPrice = this.purchasedItems.reduce(
       (total, categoryObj) =>
         total + categoryObj.products.reduce((acc, item) => acc + Number(item.price) * item.quantity, 0),
       0
     );
+
+    console.log(this.buyPrice);
+    
+  }
+
+  calculateTotalPrice(): void {
+    this.buyPrice = this.purchasedItems
+      .reduce((acc, categoryObj) => {
+        const categoryTotal = (categoryObj.products || []).reduce((sum, item) => {
+          // console.log('Tipo da variável item.price:', typeof item.price, item.price);
+          const price = this.convertFormattedPriceToNumber(item.price);
+          // console.log('Tipo da variável price:', typeof price, price);
+          
+          const quantity = item.quantity || 1;
+          return sum + price * quantity;
+        }, 0);
+        return acc + categoryTotal;
+      }, 0);
+  }
+
+  convertFormattedPriceToNumber(formattedPrice: string): number {
+    if (!formattedPrice) return 0;
+
+    // console.log("chegando", formattedPrice, typeof formattedPrice);
+    
+    // const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
+    // const cleanPrice = formattedPrice.replace(',', '.');
+    // console.log("meio", cleanPrice, typeof cleanPrice);
+    const parsedPrice = Number.parseFloat(formattedPrice);
+    // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
+    
+    return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
   removeFromPurchasedItems(category: string, index: number): void {
