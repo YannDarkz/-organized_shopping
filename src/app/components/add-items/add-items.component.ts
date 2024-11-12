@@ -61,7 +61,7 @@ export class AddItemsComponent {
       const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
       formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2)
 
-      console.log("price-add", formValue.price);
+      // console.log("price-add", formValue.price);
       
 
       const newItem: Iproduct = {
@@ -109,7 +109,6 @@ export class AddItemsComponent {
     if (!formattedPrice) return 0;
     const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
     const parsedPrice = parseFloat(cleanPrice);
-    console.log("parseFdp", parsedPrice);
     
     return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
