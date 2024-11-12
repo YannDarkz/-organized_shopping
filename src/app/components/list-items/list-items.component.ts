@@ -32,7 +32,7 @@ export class ListItemsComponent implements OnInit, OnDestroy {
   userId: string | undefined = undefined
   private updateSubscription!: Subscription;
 
-  constructor(private userService: UserService, private http: ShoppingListService, private itemUpdateService: ItemUpdateService, private userDataService: UserDataService) {}
+  constructor(private userService: UserService, private http: ShoppingListService, private itemUpdateService: ItemUpdateService, private userDataService: UserDataService) { }
 
 
   categories = ['cold', 'perishables', 'cleaning', 'others'];
@@ -47,47 +47,40 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     { category: 'others', products: [] },
   ];
 
-  itemsByCategory = {
-    perishables: [] as Iproduct[],
-    cold: [] as Iproduct[],
-    cleaning: [] as Iproduct[],
-    others: [] as Iproduct[],
-
-  };
-
   totalPrice: number = 0
 
   @ViewChild(AddItemsComponent) addItemsComponent!: AddItemsComponent;
   @ViewChild(BuyItemComponent) buyItemComponent!: BuyItemComponent;
-  
-
 
   ngOnInit(): void {
+    console.log("dados list",  this.categoriesWithItems)
+    
     this.userService.error$.subscribe(errorMsg => {
       this.messageError = errorMsg;
     });
+
+    this.updateSubscription = this.itemUpdateService.updateItems$.subscribe(() => {
+      this.loadItems();
+    });
     
-   this.updateSubscription = this.itemUpdateService.updateItems$.subscribe(() => {
-    this.loadItems();
-   });
-
-   this.userDataService.getUserData().subscribe(data => {
-    this.userData = data;
-    this.userId = data?.userId
-
-    if (this.userId) {
-      setTimeout(() => {
-        this.loadItems();
-      }, 100);
+    this.userDataService.getUserData().subscribe(data => {
+      this.userData = data;
+      this.userId = data?.userId
       
-    }
-   });
+      if (this.userId) {
+        setTimeout(() => {
+          this.loadItems();
+        }, 100);
+        
+      }
+    });
+    // console.log("dados list",  this.categoriesWithItems[0].products[0].price);
   }
 
   ngOnDestroy(): void {
-      if(this.updateSubscription) {
-        this.updateSubscription.unsubscribe();
-      }
+    if (this.updateSubscription) {
+      this.updateSubscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -96,15 +89,16 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     });
   }
 
-  
-
-  loadItems(): void {    
-    const loadObservables = this.categoriesWithItems.map(categoryObj => 
+  loadItems(): void {
+    console.log("loadI", this.categoriesWithItems);
+    
+    const loadObservables = this.categoriesWithItems.map(categoryObj =>
       this.http.getItemsByCategory(categoryObj.category, this.userId!).pipe(
-        
+
         tap(data => categoryObj.products = data.map(item => ({
+          
           ...item,
-          price: this.convertFormattedPriceToNumber(item.price).toFixed(2).toString().replace('.', ',')
+          // price: this.convertFormattedPriceToNumber(item.price).toString()
         }))),
         catchError(error => {
           this.showError(error.message);
@@ -113,13 +107,14 @@ export class ListItemsComponent implements OnInit, OnDestroy {
         })
       )
     );
+    
     forkJoin(loadObservables).subscribe({
       next: () => {
-        this.calculateTotalPrice()       
+        this.calculateTotalPrice()
       },
       error: (err) => console.error("Erro ao carregar itens:", err)
     });
-   
+
   }
 
   calculateTotalPrice(): void {
@@ -129,7 +124,7 @@ export class ListItemsComponent implements OnInit, OnDestroy {
           // console.log('Tipo da variável item.price:', typeof item.price, item.price);
           const price = this.convertFormattedPriceToNumber(item.price);
           // console.log('Tipo da variável price:', typeof price, price);
-          
+
           const quantity = item.quantity || 1;
           return sum + price * quantity;
         }, 0);
@@ -141,30 +136,28 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     if (!formattedPrice) return 0;
 
     // console.log("chegando", formattedPrice, typeof formattedPrice);
-    
-    const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
+
+    // const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
     // console.log("meio", cleanPrice, typeof cleanPrice);
-    const parsedPrice = Number.parseFloat(cleanPrice) / 10;
-    // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
+    const parsedPrice = Number.parseFloat(formattedPrice);
+    console.log("convetNummber", typeof parsedPrice);
     
+    // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
+
     return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
 
 
-   maskCurrency = (valor : number, locale = 'pt-BR', currency = 'BRL') => {
+  maskCurrency = (valor: number, locale = 'pt-BR', currency = 'BRL') => {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency
     }).format(valor)
   }
 
-
-  
-  
-
   editItem(item: Iproduct, id: number, category: string): void {
-  
+
     if (this.addItemsComponent) {
       this.addItemsComponent.startEdit(item, category);
       this.scrollToTop();
@@ -174,7 +167,7 @@ export class ListItemsComponent implements OnInit, OnDestroy {
   }
 
   deleteItem(category: string, itemId: string): void {
-    
+
     this.http.deleteItem(category, itemId).subscribe({
       next: () => {
         this.loadItems();
@@ -186,21 +179,21 @@ export class ListItemsComponent implements OnInit, OnDestroy {
 
   buyItem(item: Iproduct, category: string, index: number): void {
     const buyCategory = `${category}-Buy`;
-    
-   
+    console.log("item", item);
+
     this.http.addItem(buyCategory, item).subscribe({
       next: () => {
         const categoryObj = this.categoriesWithItems.find(cat => cat.category === category);
         if (categoryObj) {
           categoryObj.products.splice(index, 1);
         }
-        
-        
+
+
         this.http.deleteItem(category, item.id).subscribe({
           next: () => {
-            this.saveItems(); 
-            this.loadItems();  
-  
+            // this.saveItems();
+            this.loadItems();
+
             // Carregar novamente os itens comprados e emitir o evento
             this.buyItemComponent.loadPurchasedItems();
             this.notifyAddBuyItem();
@@ -212,42 +205,42 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveItems(): void {
-    localStorage.setItem('itensCategory', JSON.stringify(this.itemsByCategory));
-
-  }
 
   categoriaPT(category: string): string {
     switch (category) {
       case 'cold':
         return 'frios';
-      case 'perishables':
-        return 'perecíveis';
+        case 'perishables':
+          return 'perecíveis';
       case 'cleaning':
         return 'limpeza';
-      case 'others':
-        return 'outros';
-      default:
-        return category
+        case 'others':
+          return 'outros';
+          default:
+            return category
+          }
+        }
+
+        // saveItems(): void {
+        //   localStorage.setItem('itensCategory', JSON.stringify(this.itemsByCategory));
+        // }
+  
+  // get objectKeys() {
+    //   return Object.keys;
+    // }
+    
+    // getItemsByCategory(category: keyof typeof this.itemsByCategory): Iproduct[] {
+      //   return this.itemsByCategory[category] || [];
+      // }
+      
+
+  // clearListBuy(): void {
+    //   localStorage.removeItem('listaComprados');
+    // }
+
+    clearList(): void {
+      localStorage.removeItem('listaCompras');
     }
-  }
-
-  clearList(): void {
-    localStorage.removeItem('listaCompras');
-  }
-
-  get objectKeys() {
-    return Object.keys;
-  }
-
-  getItemsByCategory(category: keyof typeof this.itemsByCategory): Iproduct[] {
-    return this.itemsByCategory[category] || [];
-  }
-
-
-  clearListBuy(): void {
-    localStorage.removeItem('listaComprados');
-  }
 
   scrollToTop(): void {
     const scrollDuration = 30; // Tempo total em ms
@@ -272,39 +265,39 @@ export class ListItemsComponent implements OnInit, OnDestroy {
 
 
   showError(message: string): void {
-    this.messageError = message; 
+    this.messageError = message;
     setTimeout(() => {
-      this.messageError = ''; 
+      this.messageError = '';
     }, 3000);
   }
 
-  
+
   notifyAddItem(): void {
     this.addTextNotify = 'adcionado com sucesso! ✅'
     setTimeout(() => {
       this.addTextNotify = ''
-    },2000)
+    }, 2000)
   }
 
   notifyEditItem(): void {
     this.addTextNotify = 'Editado com sucesso! ✅'
     setTimeout(() => {
       this.addTextNotify = ''
-    },2000)
+    }, 2000)
   }
 
   notifyRemoveItem(): void {
     this.addTextNotify = 'Removido com sucesso! ✅'
     setTimeout(() => {
       this.addTextNotify = ''
-    },1000)
+    }, 1000)
   }
 
   notifyAddBuyItem(): void {
     this.addTextNotify = 'adcionado No carrinho! ✅'
     setTimeout(() => {
       this.addTextNotify = ''
-    },1500)
+    }, 1500)
   }
 
 

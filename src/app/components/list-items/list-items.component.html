@@ -17,7 +17,7 @@
 <app-add-items (notifyAddItem)="notifyAddItem()" (notifyEditItem)="notifyEditItem()"></app-add-items>
 <div class="list-container">
     <h4>lista de compras 📋</h4>
-    <h6><strong>💸 Total:</strong> {{totalPrice | currency:'BRL'}}</h6>
+    <h6><strong>💸 Total:</strong> {{totalPrice | currency:'BRL':'symbol': '1.2-2'}}</h6>
 
     <div *ngFor="let categoryObj of categoriesWithItems">
       <h5>{{ categoriaPT(categoryObj.category) | uppercase }}</h5>
