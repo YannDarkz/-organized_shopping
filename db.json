@@ -1,22 +1,5 @@
 {
-  "cold": [
-    {
-      "id": "a84e",
-      "name": "café",
-      "price": "10.98",
-      "quantity": 1,
-      "category": "cold",
-      "userId": "107959240786162842006"
-    },
-    {
-      "id": "d8f8",
-      "name": "bolo de Pote",
-      "price": "50.42",
-      "quantity": 1,
-      "category": "cold",
-      "userId": "107959240786162842006"
-    }
-  ],
+  "cold": [],
   "perishables": [],
   "cleaning": [],
   "others": [],
@@ -26,18 +9,11 @@
   "others-Buy": [],
   "users": [
     {
-      "id": "7b98",
+      "id": "580e",
       "userId": "107959240786162842006",
       "name": "Ian Santos",
       "email": "iansantosmcqueen@gmail.com",
       "picture": "https://lh3.googleusercontent.com/a/ACg8ocISjz7jfgCCx95GoSYT3whq2s9cf3C05ZwuqFzNv_QDjES5CJJBMw=s96-c"
-    },
-    {
-      "id": "e741",
-      "userId": "106106214451161773898",
-      "name": "DevAizen DDD",
-      "email": "iansantostph@gmail.com",
-      "picture": "https://lh3.googleusercontent.com/a/ACg8ocLQOp0ITwkMbkjLNNPoq5mmvH4ONpnpH675ymeHOLid1hWyMPUg=s96-c"
     }
   ]
 }
