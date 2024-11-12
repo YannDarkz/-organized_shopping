@@ -90,8 +90,6 @@ export class ListItemsComponent implements OnInit, OnDestroy {
   }
 
   loadItems(): void {
-    console.log("loadI", this.categoriesWithItems);
-    
     const loadObservables = this.categoriesWithItems.map(categoryObj =>
       this.http.getItemsByCategory(categoryObj.category, this.userId!).pipe(
 
@@ -124,7 +122,6 @@ export class ListItemsComponent implements OnInit, OnDestroy {
           // console.log('Tipo da variável item.price:', typeof item.price, item.price);
           const price = this.convertFormattedPriceToNumber(item.price);
           // console.log('Tipo da variável price:', typeof price, price);
-
           const quantity = item.quantity || 1;
           return sum + price * quantity;
         }, 0);
@@ -134,17 +131,14 @@ export class ListItemsComponent implements OnInit, OnDestroy {
 
   convertFormattedPriceToNumber(formattedPrice: string): number {
     if (!formattedPrice) return 0;
-
+    
+    const parsedPrice = Number.parseFloat(formattedPrice);
+    return isNaN(parsedPrice) ? 0 : parsedPrice;
+    
     // console.log("chegando", formattedPrice, typeof formattedPrice);
-
     // const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
     // console.log("meio", cleanPrice, typeof cleanPrice);
-    const parsedPrice = Number.parseFloat(formattedPrice);
-    console.log("convetNummber", typeof parsedPrice);
-    
     // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
-
-    return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
 
