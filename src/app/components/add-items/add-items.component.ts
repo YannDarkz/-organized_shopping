@@ -29,7 +29,7 @@ export class AddItemsComponent {
   
   addItemForm = this.formBuilder.group({
     name: ['', Validators.required],
-    price: ['', [Validators.required, Validators.min(0)]],
+    price: ['' , [Validators.required, Validators.min(0)]],
     quantity: [1, [Validators.required, Validators.min(1)]],
     category: ['', Validators.required]
   });
@@ -37,26 +37,17 @@ export class AddItemsComponent {
 
    formatPrice(): void {
     const priceControl = this.addItemForm.get('price');
-    let value = priceControl?.value?.toString().replace(/\D/g, ''); // Remove tudo que não é dígito
+    let value = priceControl?.value?.toString().replace(/\D/g, '');
     if (value) {
-      // Formata o valor para centavos
       value = (parseInt(value) / 100).toFixed(2); 
-      // Exibe o valor no formato de moeda
       priceControl?.setValue(value.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'), { emitEvent: false });
     }
   }
-
-  // Chamado a cada alteração no campo de preço
   onPriceInput(event: Event): void {
     this.formatPrice();
   }
 
-
-
   editing: boolean = false
-
-  
-
 
   async addItem(): Promise<void> {
     try {
@@ -67,8 +58,14 @@ export class AddItemsComponent {
         throw new Error('User id is Undefined')
       }
 
+      const formValue = { ...this.addItemForm.value } as unknown as Iproduct;
+      formValue.price = this.convertFormattedPriceToNumber(formValue.price.toString()).toFixed(2)
+
+      console.log("price-add", formValue.price);
+      
+
       const newItem: Iproduct = {
-        ...this.addItemForm.value as Iproduct,
+        ...formValue,
        userId: numericUserId, 
       };
       
@@ -91,7 +88,6 @@ export class AddItemsComponent {
           });
         }
       } else if (newCategory) {
-        // Adiciona um novo item
         this.productService.addItem(newCategory, newItem).subscribe(() => {
           this.notifyAddItem.emit();
           this.itemUpdated.emit();
@@ -106,6 +102,16 @@ export class AddItemsComponent {
       console.error('Erro ao obter o id do usuário',error);
     }
 
+  }
+
+  convertFormattedPriceToNumber(formattedPrice: string): number {
+    
+    if (!formattedPrice) return 0;
+    const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
+    const parsedPrice = parseFloat(cleanPrice);
+    console.log("parseFdp", parsedPrice);
+    
+    return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
 
   startEdit(item: Iproduct, category: string): void {
