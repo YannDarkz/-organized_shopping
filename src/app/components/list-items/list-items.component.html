@@ -25,7 +25,7 @@
         <li *ngFor="let item of categoryObj.products; let i = index">
           <app-card-list
             [name]="item.name"
-            [price]="item.price"
+            [price]="convertFormattedPriceToNumber(item.price) | currency:'BRL'"
             [quantity]="item.quantity"
             (edit)="editItem(item, i, categoryObj.category)"
             (delete)="deleteItem(categoryObj.category, item.id)"

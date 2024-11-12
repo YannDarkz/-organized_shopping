@@ -102,19 +102,20 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     const loadObservables = this.categoriesWithItems.map(categoryObj => 
       this.http.getItemsByCategory(categoryObj.category, this.userId!).pipe(
         
-        tap(data => categoryObj.products = data),
+        tap(data => categoryObj.products = data.map(item => ({
+          ...item,
+          price: this.convertFormattedPriceToNumber(item.price).toFixed(2).toString().replace('.', ',')
+        }))),
         catchError(error => {
           this.showError(error.message);
-          console.log("errot", error.message);
-          
-
+          console.log("error", error.message);
           return of(null);
         })
       )
     );
     forkJoin(loadObservables).subscribe({
       next: () => {
-        this.calculateTotalPrice(); 
+        this.calculateTotalPrice()       
       },
       error: (err) => console.error("Erro ao carregar itens:", err)
     });
@@ -125,18 +126,41 @@ export class ListItemsComponent implements OnInit, OnDestroy {
     this.totalPrice = this.categoriesWithItems
       .reduce((acc, categoryObj) => {
         const categoryTotal = (categoryObj.products || []).reduce((sum, item) => {
-          const price = item.price || 0;
-          const quantity = item.quantity || 0;
-          return sum + Number(price) * quantity;
+          // console.log('Tipo da variável item.price:', typeof item.price, item.price);
+          const price = this.convertFormattedPriceToNumber(item.price);
+          // console.log('Tipo da variável price:', typeof price, price);
+          
+          const quantity = item.quantity || 1;
+          return sum + price * quantity;
         }, 0);
         return acc + categoryTotal;
       }, 0);
   }
 
-  total() {
-    console.log("re", this.calculateTotalPrice() );
+  convertFormattedPriceToNumber(formattedPrice: string): number {
+    if (!formattedPrice) return 0;
+
+    // console.log("chegando", formattedPrice, typeof formattedPrice);
     
+    const cleanPrice = formattedPrice.replace(/\./g, '').replace(',', '.');
+    // console.log("meio", cleanPrice, typeof cleanPrice);
+    const parsedPrice = Number.parseFloat(cleanPrice) / 10;
+    // console.log("fim?",  typeof cleanPrice,  typeof parsedPrice, this.maskCurrency(parsedPrice), "karai", parseFloat(this.maskCurrency(parsedPrice)) );
+    
+    return isNaN(parsedPrice) ? 0 : parsedPrice;
   }
+
+
+
+   maskCurrency = (valor : number, locale = 'pt-BR', currency = 'BRL') => {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency
+    }).format(valor)
+  }
+
+
+  
   
 
   editItem(item: Iproduct, id: number, category: string): void {
