@@ -1,5 +1,22 @@
 {
-  "cold": [],
+  "cold": [
+    {
+      "name": "café",
+      "price": "40.00",
+      "quantity": 1,
+      "category": "cold",
+      "userId": "107959240786162842006",
+      "id": "5a68"
+    },
+    {
+      "id": "cbbc",
+      "name": "café",
+      "price": "50.41",
+      "quantity": 1,
+      "category": "cold",
+      "userId": "107959240786162842006"
+    }
+  ],
   "perishables": [],
   "cleaning": [],
   "others": [],
